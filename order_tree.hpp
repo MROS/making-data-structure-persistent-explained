@@ -37,10 +37,12 @@ public:
     void show();
 
     // 創建一個新的樹， node 的值被修改爲 value
-    OrderTree *change_value(Node *node, int value);
+    std::pair<OrderTree*, Node*> change_value(Node *node, int value);
 
     // 創建一個新的樹， node 將被移到當前 cursor 位置
-    OrderTree* to_head(Node *node);
+    std::pair<OrderTree*, Node*> to_head(Node *node);
+
+    std::pair<OrderTree*, Node*> add(int value);
 
     OrderTree* update(Node *node, int value);
 };

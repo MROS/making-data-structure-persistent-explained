@@ -6,5 +6,9 @@ using namespace std;
 int main() {
     OrderTree *order_tree = new OrderTree(3);
     order_tree->show();
-    vector<int> values;
+    for (int i = 0; i < 8; i++) {
+        auto ret = order_tree->add(i);
+        order_tree = ret.first;
+        order_tree->show();
+    }
 }

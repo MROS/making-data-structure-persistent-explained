@@ -1,8 +1,8 @@
 #include <immer/map.hpp>
 #include "order_tree.hpp"
-#include "im_lru.hpp"
+#include "persistent_lru.hpp"
 
-ImmutableLRUCache::ImmutableLRUCache(int capacity) {
+PersistentLRUCache::PersistentLRUCache(int capacity) {
     this->capacity = capacity;
     this->used = 0;
     int h = 0, c = capacity;
@@ -14,7 +14,7 @@ ImmutableLRUCache::ImmutableLRUCache(int capacity) {
     this->map = immer::map<int, Node*>{};
 }
 
-int ImmutableLRUCache::get(int key) {
+int PersistentLRUCache::get(int key) {
     Node *node = map[key];
     if (node == nullptr) {
         return -1;
@@ -23,6 +23,6 @@ int ImmutableLRUCache::get(int key) {
     return node->value;
 }
 
-ImmutableLRUCache* ImmutableLRUCache::put(int key, int value) {
+PersistentLRUCache* PersistentLRUCache::put(int key, int value) {
     return nullptr;
 }

@@ -36,7 +36,7 @@ OrderTree::OrderTree(int height, vector<int> &values) {
 void _show(Node *node, int height) {
     if (node == nullptr) {
         for (int i = 0; i < (1 << height); i++) {
-            printf("(空, 空)");
+            printf("(空, 空) ");
         }
     } else if (height > 0) {
         // 爲內部節點
@@ -58,8 +58,7 @@ std::pair<OrderTree*, Node*> OrderTree::add(int value) {
     Node *new_pointer = new Node();     // 正在創建的新樹的指標
     Node *new_root = new_pointer;
     for (int h = this->height - 1; h >= 0; h--) {
-        switch ((this->cursor & (1 << h)) == 0) {
-            case true:
+        if ((this->cursor & (1 << h)) == 0) {
             // 往左
             if (old_pointer != nullptr) {
                 new_pointer->right = old_pointer->right;
@@ -67,8 +66,7 @@ std::pair<OrderTree*, Node*> OrderTree::add(int value) {
             }
             new_pointer->left = new Node();
             new_pointer = new_pointer->left;
-            break;
-            case false:
+        } else {
             // 往右
             if (old_pointer != nullptr) {
                 new_pointer->left = old_pointer->left;
@@ -76,13 +74,13 @@ std::pair<OrderTree*, Node*> OrderTree::add(int value) {
             }
             new_pointer->right = new Node();
             new_pointer = new_pointer->right;
-            break;
         }
     }
+    new_pointer->index = this->cursor;
     new_pointer->value = value;
     OrderTree *new_tree = this->new_tree();
     new_tree->root = new_root;
-    new_tree->cursor = this->cursor + 1;
+    new_tree->cursor++;
     std::pair<OrderTree*, Node*> ret = {new_tree, new_pointer};
     return ret;
 }
@@ -91,7 +89,7 @@ std::pair<OrderTree*, Node*> OrderTree::change_value(Node *node, int value) {
     Node *old_pointer = this->root;     // 原樹的指標
     Node *new_pointer = new Node();     // 正在創建的新樹的指標
     Node *new_root = new_pointer;
-    for (int h = this->height - 1; h > 0; h--) {
+    for (int h = this->height - 1; h >= 0; h--) {
         if ((node->index & (1 << h)) == 0) {
             // 往左
             new_pointer->right = old_pointer->right;

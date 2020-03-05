@@ -11,8 +11,8 @@ Node *_createFullTree(int height, int index, vector<int> &values) {
         return new Node(index, value);
     } else {
         auto root = new Node();
-        root->left = _createFullTree(height - 1, index * 2, values);
-        root->right = _createFullTree(height - 1, index * 2 + 1, values);
+        root->children[0] = _createFullTree(height - 1, index * 2, values);
+        root->children[1] = _createFullTree(height - 1, index * 2 + 1, values);
         return root;
     }
 }
@@ -40,8 +40,8 @@ void _show(Node *node, int height) {
         }
     } else if (height > 0) {
         // 爲內部節點
-        _show(node->left, height - 1);
-        _show(node->right, height - 1);
+        _show(node->children[0], height - 1);
+        _show(node->children[1], height - 1);
     } else {
         // 爲葉子節點
         printf("(%d, %d) ", node->key, node->value);
@@ -58,23 +58,13 @@ std::pair<OrderTree*, Node*> OrderTree::add(int value) {
     Node *new_pointer = new Node();     // 正在創建的新樹的指標
     Node *new_root = new_pointer;
     for (int h = this->height - 1; h >= 0; h--) {
-        if ((this->cursor & (1 << h)) == 0) {
-            // 往左
-            if (old_pointer != nullptr) {
-                new_pointer->right = old_pointer->right;
-                old_pointer = old_pointer->left;
-            }
-            new_pointer->left = new Node();
-            new_pointer = new_pointer->left;
-        } else {
-            // 往右
-            if (old_pointer != nullptr) {
-                new_pointer->left = old_pointer->left;
-                old_pointer = old_pointer->right;
-            }
-            new_pointer->right = new Node();
-            new_pointer = new_pointer->right;
+        int br = this->cursor & (1 << h) ? 1 : 0;
+        if (old_pointer != nullptr) {
+            new_pointer->children[!br] = old_pointer->children[!br];
+            old_pointer = old_pointer->children[br];
         }
+        new_pointer->children[br] = new Node();
+        new_pointer = new_pointer->children[br];
     }
     new_pointer->index = this->cursor;
     new_pointer->value = value;
@@ -90,19 +80,11 @@ std::pair<OrderTree*, Node*> OrderTree::change_value(Node *node, int value) {
     Node *new_pointer = new Node();     // 正在創建的新樹的指標
     Node *new_root = new_pointer;
     for (int h = this->height - 1; h >= 0; h--) {
-        if ((node->index & (1 << h)) == 0) {
-            // 往左
-            new_pointer->right = old_pointer->right;
-            old_pointer = old_pointer->left;
-            new_pointer->left = new Node();
-            new_pointer = new_pointer->left;
-        } else {
-            // 往右
-            new_pointer->left = old_pointer->left;
-            old_pointer = old_pointer->right;
-            new_pointer->right = new Node();
-            new_pointer = new_pointer->right;
-        }
+        int br = node->index & (1 << h) ? 1 : 0;
+        new_pointer->children[!br] = old_pointer->children[!br];
+        old_pointer = old_pointer->children[br];
+        new_pointer->children[br] = new Node();
+        new_pointer = new_pointer->children[br];
     }
     new_pointer->value = value;
     OrderTree *new_tree = this->new_tree();
@@ -116,6 +98,10 @@ std::pair<OrderTree*, Node*> OrderTree::change_value(Node *node, int value) {
 // 2. 在 cursor 位置填入 A
 //
 // 也就是說，我們必須複製通往 node->index 的路徑，以及通往 this->cursor 的路徑
+std::pair<OrderTree*, Node*> OrderTree::to_head(Node *node) {
+    return make_pair(nullptr, nullptr);
+}
+/*
 std::pair<OrderTree*, Node*> OrderTree::to_head(Node *node) {
     Node *old_pointer = this->root;     // 原樹的指標
     Node *pointer = new Node();     // 正在創建的新樹的指標
@@ -228,6 +214,7 @@ std::pair<OrderTree*, Node*> OrderTree::to_head(Node *node) {
     // std::pair<OrderTree*, Node*> ret = {new_tree, cursor_pointer};
     return ret;
 }
+*/
 
 OrderTree *OrderTree::update(Node *node, int value) {
     return nullptr;

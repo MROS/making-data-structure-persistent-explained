@@ -5,13 +5,13 @@
 // TODO: 把 left, right 用 children[2] 取代
 class Node {
 public:
-    Node *left, *right;
+    Node *children[2];
     int key;
     int value;          // value 若爲 -1 ，表示沒有 value
     int index;          // index 若爲 -1 ，表示其爲內部節點（而非葉子節點）
-    Node() : left(nullptr), right(nullptr), key(0), value(-1), index(-1) {}
-    Node(int index) : left(nullptr), right(nullptr), key(0), value(-1), index(index) {}
-    Node(int index, int value) : left(nullptr), right(nullptr), key(0), value(value), index(index) {}
+    Node() : children{nullptr, nullptr}, key(0), value(-1), index(-1) {}
+    Node(int index) : children{nullptr, nullptr}, key(0), value(-1), index(index) {}
+    Node(int index, int value) : children{nullptr, nullptr}, key(0), value(value), index(index) {}
 };
 
 class OrderTree {

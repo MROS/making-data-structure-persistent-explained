@@ -2,6 +2,7 @@
 #include <vector>
 
 // NOTE: 有 enum 的話，可分成內部節點跟葉子節點
+// TODO: 把 left, right 用 children[2] 取代
 class Node {
 public:
     Node *left, *right;
@@ -36,13 +37,19 @@ public:
     // 打印所有葉子節點
     void show();
 
+    // 創建一個新的樹，新增一個節點到當前 cursor 位置，其值爲 value
+    std::pair<OrderTree*, Node*> add(int value);
+
     // 創建一個新的樹， node 的值被修改爲 value
     std::pair<OrderTree*, Node*> change_value(Node *node, int value);
 
     // 創建一個新的樹， node 將被移到當前 cursor 位置
     std::pair<OrderTree*, Node*> to_head(Node *node);
 
-    std::pair<OrderTree*, Node*> add(int value);
+    // 創建一個新的樹， node 的值被修改爲 value ，並且 node 將被移到當前 cursor 位置
+    std::pair<OrderTree*, Node*> put(Node *node, int value);
+    
+
 
     OrderTree* update(Node *node, int value);
 };

@@ -99,10 +99,6 @@ std::pair<OrderTree*, Node*> OrderTree::change_value(Node *node, int value) {
 //
 // 也就是說，我們必須複製通往 node->index 的路徑，以及通往 this->cursor 的路徑
 std::pair<OrderTree*, Node*> OrderTree::to_head(Node *node) {
-    return make_pair(nullptr, nullptr);
-}
-/*
-std::pair<OrderTree*, Node*> OrderTree::to_head(Node *node) {
     Node *old_pointer = this->root;     // 原樹的指標
     Node *pointer = new Node();     // 正在創建的新樹的指標
     Node *new_root = pointer;
@@ -113,19 +109,11 @@ std::pair<OrderTree*, Node*> OrderTree::to_head(Node *node) {
          common_h >= 0 && (node->index & (1 << common_h)) == (this->cursor & (1 << common_h));
          common_h--)
     {
-        if ((this->cursor & (1 << common_h)) == 0) {
-            // 往左
-            pointer->right = old_pointer->right;
-            old_pointer = old_pointer->left;
-            pointer->left = new Node();
-            pointer = pointer->left;
-        } else {
-            // 往右
-            pointer->left = old_pointer->left;
-            old_pointer = old_pointer->right;
-            pointer->right = new Node();
-            pointer = pointer->right;
-        }
+        int br = this->cursor & (1 << common_h) ? 1 : 0;
+        pointer->children[!br] = old_pointer->children[!br];
+        old_pointer = old_pointer->children[br];
+        pointer->children[br] = new Node();
+        pointer = pointer->children[br];
     }
     printf("node->index: %d, this->cursor: %d\n", node->index, this->cursor);
     printf("this->height: %d\n", this->height);
@@ -134,21 +122,13 @@ std::pair<OrderTree*, Node*> OrderTree::to_head(Node *node) {
     // 處理 node->index
     // 先觀察何處開始爲孤枝
     int lone_h = 0; // 在 lone_h 高度時沒有分叉，且一路向下也沒有任何分叉
-    Node *p = old_pointer->left; // 因爲 cursor 較新， node 必定在 cursor 之左
+    Node *p = old_pointer->children[0]; // 因爲 cursor 較新， node 必定在 cursor 之左
     for (int h = common_h - 1; h > 0; h--) {
-        if ((node->index & (1 << common_h)) == 0) {
-            // 往左
-            if (p->right == nullptr) {
-                lone_h = h;
-            }
-            p = p->left;
-        } else {
-            // 往右
-            if (p->left == nullptr) {
-                lone_h = h;
-            }
-            p = p->right;
+        int br = node->index & (1 << common_h) ? 1 : 0;
+        if (p->children[!br] == nullptr) {
+            lone_h = h;
         }
+        p = p->children[br];
     }
     printf("孤枝高度爲 %d\n", lone_h);
 
@@ -157,30 +137,16 @@ std::pair<OrderTree*, Node*> OrderTree::to_head(Node *node) {
     p = old_pointer;
     int h;
     for (h = common_h; h > lone_h; h--) {
-        if ((node->index & (1 << h)) == 0) {
-            // 往左
-            index_pointer->right = p->right;
-            index_pointer->left = new Node();
-            index_pointer = index_pointer->left;
-            p = p->left;
-        } else {
-            // 往右
-            index_pointer->left = p->left;
-            index_pointer->right = new Node();
-            index_pointer = index_pointer->right;
-            p = p->right;
-        }
+        int br = node->index & (1 << h) ? 1 : 0;
+        index_pointer->children[!br] = p->children[!br];
+        index_pointer->children[br] = new Node();
+        index_pointer = index_pointer->children[br];
+        p = p->children[br];
     }
     // 孤枝處設爲 nullptr
-    if ((node->index & (1 << h)) == 0) {
-        // 往左
-        index_pointer->right = p->right;
-        index_pointer->left = nullptr;
-    } else {
-        // 往右
-        index_pointer->left = p->left;
-        index_pointer->right = nullptr;
-    }
+    int br = node->index & (1 << h) ? 1 : 0;
+    index_pointer->children[!br] = p->children[!br];
+    index_pointer->children[br] = nullptr;
 
     // 處理 this->cursor
     // for (int h = common_h; h >= 0; h--) {
@@ -214,7 +180,6 @@ std::pair<OrderTree*, Node*> OrderTree::to_head(Node *node) {
     // std::pair<OrderTree*, Node*> ret = {new_tree, cursor_pointer};
     return ret;
 }
-*/
 
 OrderTree *OrderTree::update(Node *node, int value) {
     return nullptr;

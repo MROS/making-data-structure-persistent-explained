@@ -16,10 +16,18 @@ int main() {
     // auto ret = order_tree->change_value(nodes[0], 100);
     // ret.first->show();
     auto ret = order_tree->to_head(nodes[0]);
-    ret.first->show();
     order_tree = ret.first;
+    order_tree->show();
+
     ret = order_tree->to_head(nodes[1]);
-    ret.first->show();
+    order_tree = ret.first;
+    order_tree->show();
+
     ret = order_tree->to_head(nodes[2]);
-    ret.first->show();
+    order_tree = ret.first;
+    order_tree->show();
+
+    ret = order_tree->to_head(nodes[3]);
+    order_tree = ret.first;
+    order_tree->show();
 }

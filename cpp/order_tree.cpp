@@ -121,22 +121,28 @@ std::pair<OrderTree*, Node*> OrderTree::to_head(Node *node) {
 
     // 處理 node->index
     // 先觀察何處開始爲孤枝
-    int lone_h = 0; // 在 lone_h 高度時沒有分叉，且一路向下也沒有任何分叉
+    int lone_h = common_h; // 在 lone_h 高度時沒有分叉，且一路向下也沒有任何分叉
     Node *p = old_pointer->children[0]; // 因爲 cursor 較新， node 必定在 cursor 之左
-    for (int h = common_h - 1; h > 0; h--) {
-        int br = node->index & (1 << common_h) ? 1 : 0;
+    for (int h = common_h - 1; h >= 0; h--) {
+        int br = node->index & (1 << h) ? 1 : 0;
         if (p->children[!br] == nullptr) {
-            lone_h = h;
+            lone_h = lone_h < 0 ? h : lone_h;
+            printf("孤枝高度可能爲 %d\n", lone_h);
+        } else {
+            lone_h = -1;
         }
         p = p->children[br];
     }
     printf("孤枝高度爲 %d\n", lone_h);
 
     // 僅複製到孤枝分叉處
+
+    // 若最低共同祖先一往左就是孤枝，整條設爲 nullptr
+    // node 必在 cursor 之左
     Node *index_pointer = pointer;
     p = old_pointer;
     int h;
-    for (h = common_h; h > lone_h; h--) {
+    for (h = common_h; h > lone_h + 1; h--) {
         int br = node->index & (1 << h) ? 1 : 0;
         index_pointer->children[!br] = p->children[!br];
         index_pointer->children[br] = new Node();
@@ -149,24 +155,9 @@ std::pair<OrderTree*, Node*> OrderTree::to_head(Node *node) {
     index_pointer->children[br] = nullptr;
 
     // 處理 this->cursor
+    // p = old_pointer;
     // for (int h = common_h; h >= 0; h--) {
-    //     if ((this->cursor & (1 << h)) == 0) {
-    //         // 往左
-    //         if (old_pointer != nullptr) {
-    //             pointer->right = old_pointer->right;
-    //             old_pointer = old_pointer->left;
-    //         }
-    //         pointer->left = new Node();
-    //         pointer = pointer->left;
-    //     } else {
-    //         // 往右
-    //         if (old_pointer != nullptr) {
-    //             pointer->left = old_pointer->left;
-    //             old_pointer = old_pointer->right;
-    //         }
-    //         pointer->right = new Node();
-    //         pointer = pointer->right;
-    //     }
+    //     int br = this->cursor & (1 << h) ? 1 : 0;
     // }
     // Node *cursor_pointer = pointer;
     // cursor_pointer->index = this->cursor;
